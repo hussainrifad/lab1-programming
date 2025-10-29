@@ -1,0 +1,135 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc
+        
+    - name: Build program
+      run: |
+        gcc -o main main.c matrix.c -lm
+        
+    - name: Test matrix addition
+      run: |
+        echo "+" > input.txt
+        echo "2 2" >> input.txt
+        echo "4 4" >> input.txt
+        echo "4 4" >> input.txt
+        echo "2 2" >> input.txt
+        echo "6 6" >> input.txt
+        echo "6 6" >> input.txt
+        
+        ./main
+        
+        echo "Expected output:"
+        echo "2 2"
+        echo "10 10"
+        echo "10 10"
+        echo ""
+        echo "Actual output:"
+        cat output.txt
+        
+        if ! grep -q "2 2" output.txt || ! grep -q "10 10" output.txt; then
+          echo "Test failed: Matrix addition output incorrect"
+          exit 1
+        fi
+        echo "Matrix addition test passed!"
+        
+    - name: Test matrix subtraction
+      run: |
+        echo "-" > input.txt
+        echo "2 2" >> input.txt
+        echo "5 5" >> input.txt
+        echo "5 5" >> input.txt
+        echo "2 2" >> input.txt
+        echo "3 3" >> input.txt
+        echo "3 3" >> input.txt
+        
+        ./main
+        
+        echo "Expected output:"
+        echo "2 2"
+        echo "2 2"
+        echo "2 2"
+        echo ""
+        echo "Actual output:"
+        cat output.txt
+        
+        if ! grep -q "2 2" output.txt || ! grep -q "^2 2$" output.txt; then
+          echo "Test failed: Matrix subtraction output incorrect"
+          exit 1
+        fi
+        echo "Matrix subtraction test passed!"
+        
+    - name: Test matrix multiplication
+      run: |
+        echo "*" > input.txt
+        echo "2 2" >> input.txt
+        echo "1 2" >> input.txt
+        echo "3 4" >> input.txt
+        echo "2 2" >> input.txt
+        echo "5 6" >> input.txt
+        echo "7 8" >> input.txt
+        
+        ./main
+        
+        echo "Actual output:"
+        cat output.txt
+        # Expected: 2x2 matrix with values 19, 22, 43, 50
+        if ! grep -q "2 2" output.txt; then
+          echo "Test failed: Matrix multiplication output incorrect"
+          exit 1
+        fi
+        echo "Matrix multiplication test passed!"
+        
+    - name: Test matrix power (identity matrix)
+      run: |
+        echo "^" > input.txt
+        echo "2 2" >> input.txt
+        echo "1 0" >> input.txt
+        echo "0 1" >> input.txt
+        echo "0" >> input.txt
+        
+        ./main
+        
+        echo "Actual output:"
+        cat output.txt
+        # Expected: 2x2 identity matrix
+        if ! grep -q "2 2" output.txt || ! grep -q "1 0" output.txt; then
+          echo "Test failed: Matrix power output incorrect"
+          exit 1
+        fi
+        echo "Matrix power test passed!"
+        
+    - name: Test determinant
+      run: |
+        echo "|" > input.txt
+        echo "2 2" >> input.txt
+        echo "1 0" >> input.txt
+        echo "0 1" >> input.txt
+        
+        ./main
+        
+        echo "Actual output (determinant):"
+        cat output.txt
+        # Expected: 1 (determinant of identity matrix)
+        if ! grep -q "1" output.txt; then
+          echo "Test failed: Determinant output incorrect"
+          exit 1
+        fi
+        echo "Determinant test passed!"
+
