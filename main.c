@@ -1,81 +1,78 @@
 #include<stdio.h>
 #include<stdlib.h>
-#include<string.h>
-#include"matrix.h"
+#define NUM 10^6
+
+
+void sorting_assending(int *arr[], int size){
+    for(int i = 0; i < size-1; i++){
+        for(int j = i+1; j < size; j++){
+            if(arr[i] > arr[j]){
+                int a = arr[i];
+                arr[i] = arr[j];
+                arr[j] = a;
+            }
+        }
+    }
+}
+
+void sorting_dessending(int *arr[], int size){
+    for(int i = 0; i < size-1; i++){
+        for(int j = i+1; j < size; j++){
+            if(arr[i] < arr[j]){
+                int a = arr[i];
+                arr[i] = arr[j];
+                arr[j] = a;
+            }
+        }
+    }
+}
 
 int main(int argc, char *argv[]){
-    FILE *input_file = fopen("input.txt", "r");
-    FILE *output_file = fopen("output.txt", "w");
-    
-    if (input_file == NULL || output_file == NULL) {
-        printf("Error opening files!\n");
+    if(argc > 3){
+        printf("Too many argumnet");
         return 1;
     }
-    
-    char c;
-    fscanf(input_file, "%c", &c);
 
-    if(c == '+'){
-        int AR, AC;
-        fscanf(input_file, "%d%d", &AR, &AC);
-        float **mat1 = allocateMatrix(AC, AR);
-        inputElements(mat1, AR, AC, input_file);
-        int BR, BC;
-        fscanf(input_file, "%d%d", &BR, &BC);
-        float **mat2 = allocateMatrix(BC, BR);
-        inputElements(mat2, BR, BC, input_file);
-        matrixAddition(mat1, mat2, AR, AC, output_file);
-        freeMatrix(mat1);
-        freeMatrix(mat2);
+    char *input_file_name;
+    char *is_unique;
+    char *is_reverse;
+    char *is_num;
+
+
+    for(int i = 1; i < argc; i++){
+        if(argv[i] == "--reverse"){
+            is_reverse = "reverse";
+        }
+        else if(argv[i] == "--unique"){
+            is_unique = "unique";
+        }
+        else if(argv[i] == "--num"){
+            is_num= "num";
+        }
+        else if(i == 1){
+            input_file_name = argv[i];
+        }
     }
-    else if(c == '-'){
-        int AR, AC;
-        fscanf(input_file, "%d%d", &AR, &AC);
-        float **mat1 = allocateMatrix(AC, AR);
-        inputElements(mat1, AR, AC, input_file);
-        int BR, BC;
-        fscanf(input_file, "%d%d", &BR, &BC);
-        float **mat2 = allocateMatrix(BC, BR);
-        inputElements(mat2, BR, BC, input_file);
-        matrixsubtraction(mat1, mat2, AR, AC, output_file);
-        freeMatrix(mat1);
-        freeMatrix(mat2);
+
+    FILE *input_file = fopen(input_file_name, "r");
+
+    if(input_file == NULL){
+        return 1;
     }
-    else if(c == '*'){
-        int AR, AC;
-        fscanf(input_file, "%d%d", &AR, &AC);
-        float **mat1 = allocateMatrix(AC, AR);
-        inputElements(mat1, AR, AC, input_file);
-        int BR, BC;
-        fscanf(input_file, "%d%d", &BR, &BC);
-        float **mat2 = allocateMatrix(BC, BR);
-        inputElements(mat2, BR, BC, input_file);
-        float **newMat = matrixMultiplication(mat1, mat2, AR, AC, BR, BC);
-        printMatrix(newMat, AR, BC, output_file);
-        freeMatrix(newMat);
-        freeMatrix(mat1);
-        freeMatrix(mat2);
+
+    char number;
+    int i = 0;
+    char arr[NUM];
+    while ((number = fgetc(input_file)) != EOF){
+        arr[i] = number;
+        i++;
     }
-    else if(c == '^'){
-        int AR, AC, p;
-        fscanf(input_file, "%d%d", &AR, &AC);
-        float **mat1 = allocateMatrix(AC, AR);
-        inputElements(mat1, AR, AC, input_file);
-        fscanf(input_file, "%d", &p);
-        matrixPower(mat1, AR, p, output_file);
-        freeMatrix(mat1);
-    }
-    else if(c == '|'){
-        int AR, AC;
-        fscanf(input_file, "%d%d", &AR, &AC);
-        float **mat1 = allocateMatrix(AC, AR);
-        inputElements(mat1, AR, AC, input_file);
-        int res = determinantOfMatrix(mat1, AR);
-        fprintf(output_file, "%d", res);
-        freeMatrix(mat1);
-    }
+
+    int size = sizeof(arr)/sizeof(int);
+    
+    
 
     fclose(input_file);
-    fclose(output_file);
+
     return 0;
 }
